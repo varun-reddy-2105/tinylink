@@ -1,0 +1,12 @@
+.output-card {
+  background: #222;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.output-card a {
+  color: #ffcc66;
+  text-decoration: none;
+}
