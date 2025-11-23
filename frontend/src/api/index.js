@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Local backend API
 const api = axios.create({
-  baseURL: "http://localhost:5000", // FIXED!!!
+  baseURL: "https://<your-backend>.onrender.com"; // FIXED!!!
 });
 
 // Create a short link
