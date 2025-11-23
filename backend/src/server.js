@@ -9,11 +9,11 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `http://localhost:${PORT}`;
 
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",  // Local frontend
-  ],
-  credentials: true
+  origin: "https://tinylink-updated-frontend-latest.onrender.com",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type"],
 }));
 
 app.use(express.json());
