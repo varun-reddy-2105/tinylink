@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Local backend API
 const api = axios.create({
-  baseURL:   baseURL: "https://tinylink-backend-z4fw.onrender.com",// FIXED!!!
+  baseURL: "https://tinylink-backend-z4fw.onrender.com",// FIXED!!!
 });
 
 // Create a short link
