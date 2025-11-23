@@ -6,22 +6,28 @@ import Dashboard from "./pages/Dashboard";
 import CodeStats from "./pages/CodeStats";
 import RedirectPage from "./pages/RedirectPage";
 import Healthz from "./pages/Healthz";
+import Home from "./pages/Home"; // New Landing Page
 
 export default function App() {
   return (
     <Layout>
       <Routes>
-        {/* Dashboard (list, add, delete) */}
-        <Route path="/" element={<Dashboard />} />
+
+        {/* New Landing Page */}
+        <Route path="/" element={<Home />} />
+
+        {/* Dashboard */}
+        <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Stats for a single code */}
         <Route path="/code/:code" element={<CodeStats />} />
 
-        {/* Health check */}
+        {/* Health Check */}
         <Route path="/healthz" element={<Healthz />} />
 
-        {/* Redirect route — must be last */}
+        {/* Redirect route (MUST be last) */}
         <Route path="/:code" element={<RedirectPage />} />
+        
       </Routes>
     </Layout>
   );

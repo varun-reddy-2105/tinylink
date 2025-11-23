@@ -1,7 +1,7 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api/client";
+import { listLinks, createShortLink, deleteLink as deleteShortLink } from "../api";
 import Spinner from "../components/Spinner";
 import EmptyState from "../components/EmptyState";
 
@@ -21,8 +21,7 @@ export default function Dashboard() {
 
   const fetchLinks = () => {
     setLoading(true);
-    api
-      .listLinks()
+    listLinks()
       .then((data) => setLinks(Array.isArray(data) ? data : []))
       .catch((err) => setLoadingError(err.message || "Failed to load links"))
       .finally(() => setLoading(false));
@@ -37,7 +36,7 @@ export default function Dashboard() {
     return links.filter(
       (l) =>
         l.code.toLowerCase().includes(lower) ||
-        l.url?.toLowerCase().includes(lower) || // FIXED HERE
+        l.url?.toLowerCase().includes(lower) ||
         l.shortUrl.toLowerCase().includes(lower)
     );
   }, [links, filter]);
@@ -47,10 +46,7 @@ export default function Dashboard() {
     setFormSubmitting(true);
 
     try {
-      await api.createLink({
-        url: form.url.trim(), // FIXED HERE
-        code: form.code.trim() || undefined,
-      });
+      await createShortLink(form.url.trim());
       setForm(initialForm);
       fetchLinks();
       setFormSuccess("Short link created successfully!");
@@ -61,7 +57,7 @@ export default function Dashboard() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this link?")) return;
-    await api.deleteLink(id);
+    await deleteShortLink(id);
     fetchLinks();
   };
 
@@ -157,7 +153,6 @@ export default function Dashboard() {
                     </button>
                   </td>
 
-                  {/* Correct URL field mapping */}
                   <td className="truncate">
                     <a
                       href={link.url}
@@ -186,4 +181,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
