@@ -46,10 +46,11 @@ export default function Dashboard() {
     setFormSubmitting(true);
 
     try {
-      await createShortLink(form.url.trim());
+      await createShortLink(form.url.trim(), form.code.trim() || undefined);
       setForm(initialForm);
       fetchLinks();
       setFormSuccess("Short link created successfully!");
+      setTimeout(() => setFormSuccess(""), 2000);
     } finally {
       setFormSubmitting(false);
     }
