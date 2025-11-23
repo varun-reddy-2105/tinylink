@@ -1,6 +1,6 @@
 // src/api/client.js
 
-const BASE_URL = "http://localhost:5000"; // change if your backend lives elsewhere
+const BASE_URL = "https://tinylink-1-a71w.onrender.com"; // change if your backend lives elsewhere
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
