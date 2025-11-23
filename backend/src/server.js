@@ -1,4 +1,3 @@
-// src/server.js
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -7,32 +6,22 @@ import { PrismaClient } from "@prisma/client";
 const app = express();
 const prisma = new PrismaClient();
 
-// Local Dev Port
 const PORT = process.env.PORT || 5000;
-
-// Local Backend URL
 const BASE_URL = `http://localhost:${PORT}`;
 
-// CORS for frontend access
 app.use(cors({
   origin: [
-    "http://localhost:5173", // Vite frontend
+    "http://localhost:5173",  // Local frontend
   ],
   credentials: true
 }));
 
 app.use(express.json());
 
-// =====================
-// Health Check
-// =====================
 app.get("/healthz", (req, res) => {
   res.json({ status: "up", ok: true });
 });
 
-// =====================
-// GET /links
-// =====================
 app.get("/links", async (req, res) => {
   const links = await prisma.link.findMany({
     orderBy: { createdAt: "desc" },
@@ -51,9 +40,6 @@ app.get("/links", async (req, res) => {
   );
 });
 
-// =====================
-// POST /links
-// =====================
 app.post("/links", async (req, res) => {
   const { targetUrl, code } = req.body;
   if (!targetUrl) return res.status(400).json({ message: "URL is required" });
@@ -78,9 +64,6 @@ app.post("/links", async (req, res) => {
   });
 });
 
-// =====================
-// GET Stats
-// =====================
 app.get("/links/:code/stats", async (req, res) => {
   const link = await prisma.link.findUnique({ where: { code: req.params.code } });
   if (!link) return res.status(404).json({ message: "Link not found" });
@@ -91,9 +74,6 @@ app.get("/links/:code/stats", async (req, res) => {
   });
 });
 
-// =====================
-// DELETE Link
-// =====================
 app.delete("/links/:id", async (req, res) => {
   try {
     await prisma.link.delete({ where: { id: Number(req.params.id) } });
@@ -103,9 +83,6 @@ app.delete("/links/:id", async (req, res) => {
   }
 });
 
-// =====================
-// Redirect Short URL
-// =====================
 app.get("/:code", async (req, res) => {
   const link = await prisma.link.findUnique({ where: { code: req.params.code } });
   if (!link) return res.status(404).send("Short code not found");
@@ -121,7 +98,6 @@ app.get("/:code", async (req, res) => {
   res.redirect(link.targetUrl);
 });
 
-// Start Server
 app.listen(PORT, () => {
   console.log(`Backend running locally → ${BASE_URL}`);
 });

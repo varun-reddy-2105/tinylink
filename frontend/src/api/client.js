@@ -1,6 +1,6 @@
 // src/api/client.js
 
-const BASE_URL = "http://localhost:5000"; // Local backend URL
+const BASE_URL = "https://tinylink-backend-z4fw.onrender.com"; // Local backend URL
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
