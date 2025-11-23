@@ -19,6 +19,8 @@ export default function Dashboard() {
   const [filter, setFilter] = useState("");
   const [copyState, setCopyState] = useState({});
 
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   const fetchLinks = () => {
     setLoading(true);
     listLinks()
@@ -33,11 +35,12 @@ export default function Dashboard() {
 
   const filteredLinks = useMemo(() => {
     const lower = filter.toLowerCase();
+    const has = (v) => v?.toLowerCase().includes(lower);
     return links.filter(
       (l) =>
-        l.code.toLowerCase().includes(lower) ||
-        l.url?.toLowerCase().includes(lower) ||
-        l.shortUrl.toLowerCase().includes(lower)
+        has(l.customCode) ||
+        has(l.url) ||
+        has(l.id)
     );
   }, [links, filter]);
 
@@ -139,42 +142,49 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {filteredLinks.map((link) => (
-                <tr key={link.id}>
-                  <td>
-                    <Link to={`/code/${link.code}`}>{link.code}</Link>
-                  </td>
-                  <td>{link.totalClicks ?? 0}</td>
-                  <td>
-                    <button
-                      className="link-copy-btn"
-                      onClick={() => handleCopy(link.id, link.shortUrl)}
-                    >
-                      {copyState[link.id] || link.shortUrl}
-                    </button>
-                  </td>
+              {filteredLinks.map((link) => {
+                const shortCode = link.customCode || link.id;
+                const shortUrl = `${BASE_URL}/${shortCode}`;
 
-                  <td className="truncate">
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-original"
-                    >
-                      {link.url}
-                    </a>
-                  </td>
+                return (
+                  <tr key={link.id}>
+                    <td>
+                      <Link to={`/code/${shortCode}`}>{shortCode}</Link>
+                    </td>
 
-                  <td>
-                    <button
-                      className="btn btn-text delete-btn"
-                      onClick={() => handleDelete(link.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    <td>{link.totalClicks ?? 0}</td>
+
+                    <td>
+                      <button
+                        className="link-copy-btn"
+                        onClick={() => handleCopy(link.id, shortUrl)}
+                      >
+                        {copyState[link.id] || shortUrl}
+                      </button>
+                    </td>
+
+                    <td className="truncate">
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link-original"
+                      >
+                        {link.url}
+                      </a>
+                    </td>
+
+                    <td>
+                      <button
+                        className="btn btn-text delete-btn"
+                        onClick={() => handleDelete(link.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
