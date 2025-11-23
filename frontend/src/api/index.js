@@ -6,8 +6,9 @@ const api = axios.create({
 });
 
 // Create a short link
-export const createShortLink = (targetUrl) =>
-  api.post("/links", { targetUrl }).then(res => res.data);
+export const createShortLink = (url) =>
+  api.post("/links", { url }).then(res => res.data);
+
 
 // Get all links
 export const listLinks = () =>
