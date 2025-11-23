@@ -13,9 +13,9 @@ const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 app.use(cors());
 app.use(express.json());
 
-// ---------------------------
-// Health Check
-// ---------------------------
+/**
+ * Health Check
+ */
 app.get("/healthz", (req, res) => {
   res.json({
     status: "up",
@@ -26,9 +26,9 @@ app.get("/healthz", (req, res) => {
   });
 });
 
-// ---------------------------
-// GET /links – List all links
-// ---------------------------
+/**
+ * GET /links – List all links
+ */
 app.get("/links", async (req, res) => {
   const links = await prisma.link.findMany({
     orderBy: { createdAt: "desc" },
@@ -36,42 +36,48 @@ app.get("/links", async (req, res) => {
 
   res.json(
     links.map((l) => ({
-      ...l,
-      shortUrl: `${BASE_URL}/${l.code}`,
+      id: l.id,
+      code: l.code,
+      url: l.targetUrl, // frontend expects 'url'
+      totalClicks: l.totalClicks ?? 0,
+      createdAt: l.createdAt,
+      lastClickedAt: l.lastClickedAt,
+      shortUrl: `${BASE_URL}/${l.code}`, // correct Render domain
     }))
   );
 });
 
-// ---------------------------
-// POST /links – Create link
-// ---------------------------
+/**
+ * POST /links – Create a short link
+ */
 app.post("/links", async (req, res) => {
   const { url, code } = req.body;
 
   if (!url) return res.status(400).json({ message: "URL is required" });
 
-  let finalCode = code || Math.random().toString(36).substring(2, 8);
+  const finalCode = code || Math.random().toString(36).substring(2, 8);
 
   const exists = await prisma.link.findUnique({ where: { code: finalCode } });
-
   if (exists) return res.status(409).json({ message: "Code already exists" });
 
   const link = await prisma.link.create({
-    data: {
-      code: finalCode,
-      targetUrl: url,
-    },
+    data: { code: finalCode, targetUrl: url },
   });
 
   res.status(201).json({
-    ...link,
+    id: link.id,
+    code: link.code,
+    url: link.targetUrl,
+    totalClicks: link.totalClicks,
+    createdAt: link.createdAt,
+    lastClickedAt: link.lastClickedAt,
     shortUrl: `${BASE_URL}/${link.code}`,
   });
 });
 
-// ---------------------------
-// GET /links/:code/stats
-// ---------------------------
+/**
+ * GET /links/:code/stats
+ */
 app.get("/links/:code/stats", async (req, res) => {
   const { code } = req.params;
   const link = await prisma.link.findUnique({ where: { code } });
@@ -79,14 +85,19 @@ app.get("/links/:code/stats", async (req, res) => {
   if (!link) return res.status(404).json({ message: "Link not found" });
 
   res.json({
-    ...link,
+    id: link.id,
+    code: link.code,
+    url: link.targetUrl,
+    totalClicks: link.totalClicks,
+    createdAt: link.createdAt,
+    lastClickedAt: link.lastClickedAt,
     shortUrl: `${BASE_URL}/${link.code}`,
   });
 });
 
-// ---------------------------
-// DELETE /links/:id
-// ---------------------------
+/**
+ * DELETE /links/:id
+ */
 app.delete("/links/:id", async (req, res) => {
   const id = Number(req.params.id);
   try {
@@ -97,10 +108,10 @@ app.delete("/links/:id", async (req, res) => {
   }
 });
 
-// ---------------------------
-// Redirect short code
-// (MUST BE LAST!)
-// ---------------------------
+/**
+ * Redirect for short link
+ * (MUST BE LAST)
+ */
 app.get("/:code", async (req, res) => {
   const { code } = req.params;
   const link = await prisma.link.findUnique({ where: { code } });
@@ -119,5 +130,5 @@ app.get("/:code", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Backend running → http://localhost:${PORT}`);
+  console.log(`Backend running → ${BASE_URL}`);
 });

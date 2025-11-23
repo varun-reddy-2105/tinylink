@@ -37,7 +37,7 @@ export default function Dashboard() {
     return links.filter(
       (l) =>
         l.code.toLowerCase().includes(lower) ||
-        l.targetUrl?.toLowerCase().includes(lower) || // FIXED HERE
+        l.url?.toLowerCase().includes(lower) || // FIXED HERE
         l.shortUrl.toLowerCase().includes(lower)
     );
   }, [links, filter]);
@@ -48,7 +48,7 @@ export default function Dashboard() {
 
     try {
       await api.createLink({
-        targetUrl: form.url.trim(), // FIXED HERE
+        url: form.url.trim(), // FIXED HERE
         code: form.code.trim() || undefined,
       });
       setForm(initialForm);
@@ -105,9 +105,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {formSuccess && (
-            <p className="form-success-message">{formSuccess}</p>
-          )}
+          {formSuccess && <p className="form-success-message">{formSuccess}</p>}
 
           <button className="btn btn-primary" disabled={formSubmitting}>
             {formSubmitting ? <Spinner size="sm" /> : "Create Link"}
@@ -159,15 +157,15 @@ export default function Dashboard() {
                     </button>
                   </td>
 
-                  {/* 🌟 FIXED Original URL field */}
+                  {/* Correct URL field mapping */}
                   <td className="truncate">
                     <a
-                      href={link.targetUrl}
+                      href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link-original"
                     >
-                      {link.targetUrl}
+                      {link.url}
                     </a>
                   </td>
 
@@ -188,3 +186,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
